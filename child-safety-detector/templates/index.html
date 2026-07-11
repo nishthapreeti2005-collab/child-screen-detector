@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guardian Lens — AI Child Screen Safety Detector</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,680&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div id="toastContainer" class="toast-container"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+        <path d="M15 2 L27 6.5 V14.5 C27 21.5 22 26.5 15 28.5 C8 26.5 3 21.5 3 14.5 V6.5 Z" stroke="currentColor" stroke-width="1.8" fill="none"/>
+        <circle cx="15" cy="14" r="5" stroke="currentColor" stroke-width="1.6" fill="none"/>
+        <circle cx="15" cy="14" r="1.6" fill="currentColor"/>
+      </svg>
+    </span>
+    <div>
+      <h1>Guardian Lens</h1>
+      <p class="tagline">AI Child Screen Safety Detector</p>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="monitor-status" id="monitorStatus">
+      <span class="dot dot-off" id="statusDot"></span>
+      <span id="statusText">Monitoring Off</span>
+    </div>
+    <button id="themeToggle" class="theme-toggle" title="Toggle dark mode">🌙</button>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- Hero: signature lens/aperture safety score -->
+  <section class="hero-card">
+    <div class="hero-decor" aria-hidden="true"></div>
+
+    <!-- Original illustration: a watchful "guardian eye" shield with
+         orbiting protection badges (heart=care, lock=privacy,
+         bubble=communication, star=trust) -->
+    <svg class="hero-illustration" viewBox="0 0 220 220" aria-hidden="true">
+      <defs>
+        <linearGradient id="irisGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#35E0C0"/>
+          <stop offset="100%" stop-color="#106056"/>
+        </linearGradient>
+        <linearGradient id="shieldGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="rgba(234,247,243,0.16)"/>
+          <stop offset="100%" stop-color="rgba(234,247,243,0.04)"/>
+        </linearGradient>
+      </defs>
+
+      <circle cx="110" cy="110" r="95" fill="none" stroke="rgba(234,247,243,0.12)" stroke-width="1" stroke-dasharray="2 6"/>
+
+      <path d="M110 30 L165 50 V100 C165 140 142 168 110 182 C78 168 55 140 55 100 V50 Z"
+            fill="url(#shieldGrad)" stroke="rgba(234,247,243,0.35)" stroke-width="1.5"/>
+
+      <!-- watchful eye -->
+      <path d="M78 104 C90 88 130 88 142 104 C130 120 90 120 78 104 Z" fill="rgba(234,247,243,0.9)"/>
+      <circle cx="110" cy="104" r="13" fill="url(#irisGrad)"/>
+      <circle cx="110" cy="104" r="4.5" fill="#06231F"/>
+      <circle cx="106" cy="100" r="2" fill="#EAF7F3" opacity="0.8"/>
+
+      <!-- orbiting protection badges -->
+      <g>
+        <circle cx="52" cy="58" r="15" fill="#D6467F"/>
+        <text x="52" y="63" font-size="14" text-anchor="middle">❤</text>
+      </g>
+      <g>
+        <circle cx="172" cy="62" r="15" fill="#7C5CBF"/>
+        <text x="172" y="67" font-size="13" text-anchor="middle">🔒</text>
+      </g>
+      <g>
+        <circle cx="44" cy="150" r="15" fill="#D9B23C"/>
+        <text x="44" y="155" font-size="13" text-anchor="middle">💬</text>
+      </g>
+      <g>
+        <circle cx="176" cy="152" r="15" fill="#35E0C0"/>
+        <text x="176" y="157" font-size="13" text-anchor="middle">★</text>
+      </g>
+    </svg>
+
+    <div class="ring-wrap">
+      <div class="scan-sweep" id="scanSweep" aria-hidden="true"></div>
+      <svg viewBox="0 0 140 140" class="safety-ring">
+        <circle cx="70" cy="70" r="60" class="ring-track"/>
+        <circle cx="70" cy="70" r="48" class="ring-track-inner"/>
+        <circle cx="70" cy="70" r="60" class="ring-progress" id="ringProgress"/>
+      </svg>
+      <div class="ring-label">
+        <span class="ring-number" id="safetyScore">100</span>
+        <span class="ring-unit">% safe</span>
+      </div>
+    </div>
+
+    <div class="hero-controls">
+      <p class="hero-eyebrow">Live protection</p>
+      <h2 class="hero-title">Watching over the screen, so you don't have to</h2>
+      <p class="hero-desc">Guardian Lens scans for signs of cyberbullying, inappropriate language, adult content, hateful speech, scams, and grooming — and alerts you the moment something looks wrong.</p>
+
+      <div class="protection-chips">
+        <span class="chip-cat" style="--chip-color:#E75454">🤬 Bullying</span>
+        <span class="chip-cat" style="--chip-color:#F0A93E">🤐 Profanity</span>
+        <span class="chip-cat" style="--chip-color:#D6467F">🔞 Adult content</span>
+        <span class="chip-cat" style="--chip-color:#9B2C2C">⚔️ Hate speech</span>
+        <span class="chip-cat" style="--chip-color:#D9B23C">💰 Scams</span>
+        <span class="chip-cat" style="--chip-color:#7C5CBF">🕵️ Grooming</span>
+      </div>
+
+      <div class="btn-row">
+        <button id="toggleMonitorBtn" class="btn btn-primary">▶ Start Safety Monitoring</button>
+        <button id="scanNowBtn" class="btn btn-secondary">🔍 Scan Now</button>
+      </div>
+      <p class="privacy-note">🔒 Screenshots are analyzed in memory and never saved. Only short text snippets are stored locally on this device.</p>
+    </div>
+  </section>
+
+  <!-- Summary cards -->
+  <section class="stats-grid">
+    <div class="stat-card" data-filter="all">
+      <span class="stat-icon icon-total">📊</span>
+      <span class="stat-value" id="statTotal">0</span>
+      <span class="stat-label">Total Scans</span>
+    </div>
+    <div class="stat-card stat-safe" data-filter="Safe">
+      <span class="stat-icon icon-safe">✅</span>
+      <span class="stat-value" id="statSafe">0</span>
+      <span class="stat-label">Safe</span>
+    </div>
+    <div class="stat-card stat-medium" data-filter="Medium">
+      <span class="stat-icon icon-medium">⚠️</span>
+      <span class="stat-value" id="statMedium">0</span>
+      <span class="stat-label">Warnings</span>
+    </div>
+    <div class="stat-card stat-high" data-filter="High">
+      <span class="stat-icon icon-high">🔴</span>
+      <span class="stat-value" id="statHigh">0</span>
+      <span class="stat-label">High Risk</span>
+    </div>
+  </section>
+
+  <!-- Category breakdown -->
+  <section class="panel" id="categoryPanel">
+    <div class="panel-head">
+      <h2>Detection Breakdown</h2>
+    </div>
+    <div id="categoryBars" class="category-bars">
+      <p class="empty-state">
+        <span class="empty-icon">🕊️</span>
+        Nothing detected yet — the breakdown will appear here once a scan finds something.
+      </p>
+    </div>
+  </section>
+
+  <!-- Recent scans -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Recent Detections</h2>
+      <button id="clearDataBtn" class="btn btn-ghost">🗑 Clear Data</button>
+    </div>
+
+    <div class="filter-tabs" id="filterTabs">
+      <button class="tab active" data-filter="all">All</button>
+      <button class="tab" data-filter="Safe">✅ Safe</button>
+      <button class="tab" data-filter="Medium">⚠️ Warning</button>
+      <button class="tab" data-filter="High">🔴 High Risk</button>
+    </div>
+
+    <div id="scanList" class="scan-list">
+      <p class="empty-state">
+        <span class="empty-icon">🔍</span>
+        No scans yet. Click "Scan Now" or start monitoring to begin.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<!-- Floating chatbot -->
+<button id="chatToggle" class="chat-toggle">💬</button>
+<div id="chatPanel" class="chat-panel hidden">
+  <div class="chat-head">
+    <span class="chat-head-title"><span class="chat-avatar bot-avatar">🛡️</span> AI Safety Assistant</span>
+    <button id="chatClose" class="chat-close">✕</button>
+  </div>
+  <div id="chatMessages" class="chat-messages">
+    <div class="chat-row bot">
+      <span class="chat-avatar bot-avatar">🛡️</span>
+      <div class="chat-msg bot">Hi! Ask me anything about keeping your child safe online — e.g. "What should I do if my child receives bullying messages?"</div>
+    </div>
+  </div>
+  <div class="chat-suggestions" id="chatSuggestions">
+    <button class="chip">Bullying messages?</button>
+    <button class="chip">Stranger contact?</button>
+    <button class="chip">Screen time limits?</button>
+  </div>
+  <div class="chat-input-row">
+    <input id="chatInput" type="text" placeholder="Type your question...">
+    <button id="chatSend" class="btn btn-primary btn-small">Send</button>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
